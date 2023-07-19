@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ecological Connections</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js"></script>
+    <!--Links to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&family=Vollkorn:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin:0;
+            border:0;
+            padding:0;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-weight: 300;
+        }
+        
+        #map {
+            position:absolute;
+            left:25%;
+            top:20%;
+            bottom:0;
+            width:75%;
+        }
+        
+        #title {
+            z-index: 99999;
+            text-align: left;
+            position:absolute;
+            top: 0;
+            height: 20%;
+            width: 100%;
+            background-color: #658E9C;
+            color: #F7F7F7
+        } 
+        #titleText{
+            margin-left: 15px
+        }
+        
+        .sidenav{ 
+            position: absolute;
+            background-color: #DBDBDC;
+            top: 20%;
+            left: 0px;
+            width: 25%;
+            height: 80%;
+        }
+        #sidenavText {
+            margin-left: 15px;
+            margin-top: 15px
+        }
+        #info {
+            position:relative;
+            top: 40px;
+        }
+
+        h1 {
+            font-family: 'Vollkorn', serif;
+            font-weight: 800;
+            font-size: 28pt;
+        }
+        h2 {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-weight: 300;
+        }
+        h3 {
+            font-family: 'Vollkorn', serif;
+            font-weight: 600;
+            font-size: 16pt;
+        }
+        b {
+            font-family: 'Vollkorn', serif;
+            font-weight: 600;
+            font-size: 12pt;
+        }
+        
+        /* unvisited link */
+        a:link {
+            color: #236126;
+        }
+        /* visited link */
+        a:visited {
+            color: #236126;
+        }
+        
+        /*Changing popup colors*/
+        .mapboxgl-popup-content{
+            background-color: #658E9C;
+            color: #F7F7F7;
+        }
+        .mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+        .mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
+        .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+            border-bottom-color: #658E9C;
+        }
+        .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+        .mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+        .mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
+            border-top-color: #658E9C;
+        }
+        .mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+            border-right-color: #658E9C;
+        }
+        .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+            border-left-color: #658E9C;
+        }
+        
+        /* Code to make checkbox into a retangular toggle from W3schools */
+        /* The switch - the box around the slider */
+        .switch {
+            position: absolute;
+            display: inline-block;
+            left: 75%;
+            width: 30px;
+            height: 17px;
+        }
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #F7F7F7;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 13px;
+            width: 13px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #DBDBDC;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        /* Other slider funtions */
+        input:checked + .slider {
+            background-color: #6E8D9A;
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 1px #6E8D9A;
+        }
+        input:checked + .slider:before {
+            -webkit-transform: translateX(13px);
+            -ms-transform: translateX(13px);
+            transform: translateX(13px);
+        }
+        
+        /* Changing specifc slider color, copied from code above*/
+        /* TreeSlider color */
+        input:checked + #TreeSlider {
+            background-color: #236126;
+        }
+        input:focus + #TreeSlider {
+            box-shadow: 0 0 1px #236126;
+        }
+        /* NestSlider color */
+        input:checked + #NestSlider {
+            background-color: blue; /* UPDATE */
+        }
+        input:focus + #NestSlider {
+            box-shadow: 0 0 1px blue;
+        }
+        /* BeeSlider color */
+        input:checked + #BeeSlider {
+            background-color: purple; /* UPDATE */
+        }
+        input:focus + #BeeSlider {
+            box-shadow: 0 0 1px purple;
+        }
+        /* RoofSlider color */
+        input:checked + #RoofSlider {
+            background-color: orange; /* UPDATE */
+        }
+        input:focus + #RoofSlider {
+            box-shadow: 0 0 1px orange;
+        }
+        /* ParkSlider color */
+        input:checked + #ParkSlider {
+            background-color: yellow; /* UPDATE */
+        }
+        input:focus + #ParkSlider {
+            box-shadow: 0 0 1px yellow;
+        }
+        /* BatSlider color */
+        input:checked + #BatSlider {
+            background-color: brown; /* UPDATE */
+        }
+        input:focus + #BatSlider {
+            box-shadow: 0 0 1px brown;
+        }
+        /* AgSlider color */
+        input:checked + #AgSlider {
+            background-color: grey;
+        }
+        input:focus + #AgSlider {
+            box-shadow: 0 0 1px grey;
+        }
+        /* EcoSlider color */
+        input:checked + #EcoSlider {
+            background-color: red;
+        }
+        input:focus + #EcoSlider {
+            box-shadow: 0 0 1px red;
+        }
+        /* PassSlider color */
+        input:checked + #PassSlider {
+            background-color: pink;
+        }
+        input:focus + #PassSlider {
+            box-shadow: 0 0 1px pink;
+        }
+        /* PairSlider color */
+        input:checked + #PairSlider {
+            background-color: black;
+        }
+        input:focus + #PairSlider {
+            box-shadow: 0 0 1px black;
+        }
+    </style>
+    </head>
+    
+<body>
+    <div id="map"></div>
+    <div id='title'>
+        <div id='titleText'>
+            <h1>Ecological Connections and a Healthy Ecosystem</h1>
+            <h2>An Amsterdam Case Study</h2>
+        </div>
+    </div>
+    
+    <div class="sidenav">
+        <div id='sidenavText'>
+            <p>This interactive map of Amsterdam shows all of the different ecological aspects across the city. It helps demonstrate how well spread out and connected green spaces are around the city. The connection between green spaces is an important aspect of keeping a city's ecosystem healthy. Without the connection, ecosystems and habitats will be fragmented which negatively affects the animals living in and around the city. Amsterdam can be used as a case study to show how a dense city can still have connected green spaces and a healthy ecosystem.</p><hr>
+            <!--Layer switches-->
+            <b>Animals</b> <br>
+            <div> Birds
+                <label class="switch" > 
+                    <input type="checkbox" id="NestSwitch" onclick="nestVis()" checked>
+                    <span id="NestSlider" class="slider"></span>
+                </label>
+            </div>
+            <div> Breeding Park Birds
+                <label class="switch" > 
+                    <input type="checkbox" id="PairSwitch" onclick="pairVis()" checked>
+                    <span id="PairSlider" class="slider"></span>
+                </label>
+            </div>
+            <div> Honey Bees
+                <label class="switch" > 
+                    <input type="checkbox" id="BeeSwitch" onclick="beeVis()" checked>
+                    <span id="BeeSlider" class="slider"></span>
+                </label>
+            </div>
+            <div> Bats
+                <label class="switch" > 
+                    <input type="checkbox" id="BatSwitch" onclick="batVis()" checked>
+                    <span id="BatSlider" class="slider"></span>
+                </label>
+            </div>
+            <hr><b>Green Spaces and Habitats</b> <br>
+            <div> Urban Trees
+                <label class="switch" > 
+                    <input type="checkbox" id="TreeSwitch" onclick="treeVis()">
+                    <span id="TreeSlider" class="slider"></span>
+                </label>
+            </div>
+            <div> Parks and Recreation Areas
+                <label class="switch" > 
+                    <input type="checkbox" id="ParkSwitch" onclick="parkVis()">
+                    <span id="ParkSlider" class="slider"></span>
+                </label>
+            </div>
+            <div> Green Roofs
+                <label class="switch" > 
+                    <input type="checkbox" id="RoofSwitch" onclick="roofVis()">
+                    <span id="RoofSlider" class="slider"></span>
+                </label>
+            </div>
+            <div> Urban Agriculture
+                <label class="switch" > 
+                    <input type="checkbox" id="AgSwitch" onclick="agVis()">
+                    <span id="AgSlider" class="slider"></span>
+                </label>
+            </div>     
+            <div> Eco Passages
+                <label class="switch" > 
+                    <input type="checkbox" id="PassSwitch" onclick="passVis()">
+                    <span id="PassSlider" class="slider"></span>
+                </label>
+            </div>
+            <div> Eco Stuctures
+                <label class="switch" > 
+                    <input type="checkbox" id="EcoSwitch" onclick="ecoVis()">
+                    <span id="EcoSlider" class="slider"></span>
+                </label>
+            </div>
+            <hr>Data from the <a href=https://maps.amsterdam.nl/open_geodata/ target='_blank'>Municipality of Amsterdam</a>.
+        </div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoiam9tZXJzb24iLCJhIjoiY2o1bXE2bHlyMnJhZDMzbnpyMnhlODdpcSJ9.QJMJ_cTFCY050aZfSn1umQ';
+
+        //Map bounds
+        var bounds = [
+		    [4.6, 52.25], // Southwest coordinates
+		    [5.2, 52.5] // Northeast coordinates 
+		];
+        //Initialize the map
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v11',
+            center: [4.899875, 52.36],
+            zoom: 11,
+            minZoom: 10,
+            maxBounds: bounds,
+        });
+        // Add zoom and rotation controls to the map.
+        map.addControl(new mapboxgl.NavigationControl());
+       
+        //Map on load function
+        map.on('load', () => { 
+            //Eco Structures GeoJSOn source
+            map.addSource('Structures', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=ECOSTRUCTUUR&THEMA=ecopassages'
+            });
+            //Add Structure source to map as layer
+            map.addLayer({
+                'id': 'eco-layer',
+                'type': 'fill',
+                'source': 'Structures',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'fill-color': "red",
+                }
+            });
+            
+            //Parks Locations GeoJSOn source
+            map.addSource('Park', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=PARKPLANTSOENGROEN&THEMA=stadsparken'
+            });
+            //Add Park source to map as layer
+            map.addLayer({
+                'id': 'park-layer',
+                'type': 'fill',
+                'source': 'Park',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'fill-color': "yellow",
+                }
+            });
+            //Park popup code
+            map.on('click', 'park-layer', (e) => {
+                new mapboxgl.Popup()
+                    .setLngLat(e.lngLat)
+                    .setHTML(e.features[0].properties.Naam)
+                    .addTo(map);
+            });
+            // Mouseover code for park layer
+            map.on('mouseenter', 'park-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'park-layer', function () {
+                map.getCanvas().style.cursor = '';
+            });
+                
+            //Trees (part 1) GeoJSOn source
+            map.addSource('Trees1', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=BOMEN||1&THEMA=bomen'
+            });
+            //Add Trees (part 1) source to map as layer
+            map.addLayer({
+                'id': 'tree1-layer',
+                'type': 'circle',
+                'source': 'Trees1',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-color': "green",
+                    'circle-radius': 2,
+                }
+            });
+            // Trees (part 1) popup code
+            map.on('click', 'tree1-layer', (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const description = "<i>" + e.features[0].properties.Soortnaam_WTS + "</i>";
+                //Tree popup appears over points.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                //Adding tree popup to map
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                });      
+            // Mouseover code for tree1 layer
+            map.on('mouseenter', 'tree1-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+                    });
+                map.on('mouseleave', 'tree1-layer', function () {
+                    map.getCanvas().style.cursor = '';
+            });   
+            
+            //Trees (part 2) GeoJSOn source
+            map.addSource('Trees2', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=BOMEN||2&THEMA=bomen'
+            });
+            //Add Trees (part 2) source to map as layer
+            map.addLayer({
+                'id': 'tree2-layer',
+                'type': 'circle',
+                'source': 'Trees2',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-color': "green",
+                    'circle-radius': 2,
+                }
+            });
+            // Trees (part 2) popup code
+            map.on('click', 'tree2-layer', (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const description = "<i>" + e.features[0].properties.Soortnaam_WTS + "</i>";
+                //Tree popup appears over points.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                //Adding tree popup to map
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                });      
+            // Mouseover code for tree2 layer
+            map.on('mouseenter', 'tree2-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'tree2-layer', function () {
+                map.getCanvas().style.cursor = '';
+            });
+           
+            //Trees (part 3) GeoJSOn source
+            map.addSource('Trees3', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=BOMEN||3&THEMA=bomen'
+            });
+            //Add Trees (part 3) source to map as layer
+            map.addLayer({
+                'id': 'tree3-layer',
+                'type': 'circle',
+                'source': 'Trees3',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-color': "green",
+                    'circle-radius': 2,
+                }
+            });
+            // Trees (part 3) popup code
+            map.on('click', 'tree3-layer', (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const description = "<i>" + e.features[0].properties.Soortnaam_WTS + "</i>";
+                //Tree popup appears over points.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                //Adding tree popup to map
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                });      
+            // Mouseover code for tree3 layer
+            map.on('mouseenter', 'tree3-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'tree3-layer', function () {
+                map.getCanvas().style.cursor = '';
+            });
+            
+            //Trees (part 4) GeoJSOn source
+            map.addSource('Trees4', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=BOMEN||4&THEMA=bomen'
+            });
+            //Add Trees (part 4) source to map as layer
+            map.addLayer({
+                'id': 'tree4-layer',
+                'type': 'circle',
+                'source': 'Trees4',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-color': "green",
+                    'circle-radius': 2,
+                }
+            });
+            // Trees (part 4) popup code
+            map.on('click', 'tree4-layer', (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const description = "<i>" + e.features[0].properties.Soortnaam_WTS + "</i>";
+                //Tree popup appears over points.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                //Adding tree popup to map
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                });      
+            // Mouseover code for tree4 layer
+            map.on('mouseenter', 'tree4-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'tree4-layer', function () {
+                map.getCanvas().style.cursor = '';
+            }); 
+            
+            ///Urban Agriculture GeoJSOn source
+            map.addSource('Ag', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=STADSLANDBOUW_PUNT&THEMA=stadslandbouw'
+            });
+            //Add Urban Agriculture source to map as layer
+            map.addLayer({
+                'id': 'ag-layer',
+                'type': 'circle',
+                'source': 'Ag',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-color': "grey",
+                    'circle-radius': 2,
+                }
+            });
+   
+            //Green Roof Locations GeoJSOn source
+            map.addSource('Roof', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=GROENE_DAKEN&THEMA=groene_daken'
+            });
+            //Add Green Roof source to map as layer
+            map.addLayer({
+                'id': 'roof-layer',
+                'type': 'circle',
+                'source': 'Roof',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-color': "orange",
+                    'circle-radius': 2,
+                }
+            }); 
+            // Green roof popup code
+            map.on('click', 'roof-layer', (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const description = "Type of Green Roof (Dutch): <br>" + e.features[0].properties.Soort_tuin ;
+                //roof popup appears over points.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                //Adding roof popup to map
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                });      
+            // Mouseover code for roof layer
+            map.on('mouseenter', 'roof-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'roof-layer', function () {
+                map.getCanvas().style.cursor = '';
+            }); 
+            
+            //Eco Passages Locations GeoJSOn source
+            map.addSource('Passages', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=ECOPASSAGES&THEMA=ecopassages'
+            });
+            //Add passages source to map as layer
+            map.addLayer({
+                'id': 'pass-layer',
+                'type': 'circle',
+                'source': 'Passages',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'circle-color': "pink",
+                    'circle-radius': 2,
+                }
+            });
+            //Passages popup code
+            map.on('click', 'pass-layer', (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const description = "Type of Passage (Dutch): " + e.features[0].properties.Type_oplossing + "<br>Description (Dutch): " + e.features[0].properties.Beschrijving_oplossing + "<br>Status (Dutch): " + e.features[0].properties.Status;
+                //Passage popup appears over points.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                //Adding passage popup to map
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                });    
+            // Mouseover code for passages layer
+            map.on('mouseenter', 'pass-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'pass-layer', function () {
+                map.getCanvas().style.cursor = '';
+            });
+                
+            
+            //Beehive locations GeoJSOn source
+            map.addSource('Bee', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=BIJEN_HONING&THEMA=honingbijen'
+            });
+            //Add Beehive source to map as layer
+            map.addLayer({
+                'id': 'bee-layer',
+                'type': 'circle',
+                'source': 'Bee',
+                'paint': {
+                    'circle-color': "purple",
+                    'circle-radius': 2,
+                }
+            });
+            
+            //Bat Locations GeoJSOn source
+            map.addSource('Bat', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=VLEERMUIS_VERBLIJF&THEMA=vleermuizen'
+            });
+            //Add bat source to map as layer
+            map.addLayer({
+                'id': 'bat-layer',
+                'type': 'circle',
+                'source': 'Bat',
+                'paint': {
+                    'circle-color': "brown",
+                    'circle-radius': 2,
+                }
+            });
+            // Bat popup code
+            map.on('click', 'bat-layer', (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const description = "Type of Bat (Dutch): <br>" + e.features[0].properties.Soort;
+                //Bat popup appears over points.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                //Adding bat popup to map
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                });      
+            // Mouseover code for bat layer
+            map.on('mouseenter', 'bat-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'bat-layer', function () {
+                map.getCanvas().style.cursor = '';
+            });
+            
+            //Breeding Park Birds Locations GeoJSOn source
+            map.addSource('ParkBirds', {
+                type: 'geojson',
+                data: 'https://kmccravy.github.io/StudyAbroad/Park_Birds.geojson'
+            });
+            //Add Park birds source to map as layer
+            map.addLayer({
+                'id': 'pair-layer',
+                'type': 'circle',
+                'source': 'ParkBirds',
+                'paint': {
+                    'circle-color': "black",
+                    'circle-radius': 2,
+                }
+            });
+            // Park birds popup code
+            map.on('click', 'pair-layer', (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const description = "Type of Bird: " + e.features[0].properties.Name + "<br> There are " + e.features[0].properties.Breeding_Pairs + " breeding pairs at this location." ;
+                //Park bird popup appears over points.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                //Adding bat popup to map
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                });      
+            // Mouseover code for pair layer
+            map.on('mouseenter', 'pair-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'pair-layer', function () {
+                map.getCanvas().style.cursor = '';
+            });
+            
+            
+            //Nesting Locations GeoJSOn source
+            map.addSource('Nesting', {
+                type: 'geojson',
+                data: 'https://maps.amsterdam.nl/open_geodata/geojson_lnglat.php?KAARTLAAG=VOGELS&THEMA=vogels'
+            });
+            //Add Nesting source to map as layer
+            map.addLayer({
+                'id': 'nesting-layer',
+                'type': 'circle',
+                'source': 'Nesting',
+                'paint': {
+                    'circle-color': "blue",
+                    'circle-radius': 2,
+                }
+            });
+            // Nesting popup code
+            map.on('click', 'nesting-layer', (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const description = "Type of Bird (Dutch): <br>" + e.features[0].properties.Vogel;
+                //Nesting popup appears over points.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                //Adding nesting popup to map
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                });      
+            // Mouseover code for nesting layer
+            map.on('mouseenter', 'nesting-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseleave', 'nesting-layer', function () {
+                map.getCanvas().style.cursor = '';
+            }); 
+        });
+        
+        //Switches
+        function treeVis(){
+            if (document.getElementById("TreeSwitch").checked)
+            {
+                map.setLayoutProperty('tree1-layer', 'visibility', 'visible');
+                map.setLayoutProperty('tree2-layer', 'visibility', 'visible');
+                map.setLayoutProperty('tree3-layer', 'visibility', 'visible');
+                map.setLayoutProperty('tree4-layer', 'visibility', 'visible');
+            }
+            else{
+                map.setLayoutProperty('tree1-layer', 'visibility', 'none');
+                map.setLayoutProperty('tree2-layer', 'visibility', 'none');
+                map.setLayoutProperty('tree3-layer', 'visibility', 'none');
+                map.setLayoutProperty('tree4-layer', 'visibility', 'none');
+            }
+        }
+        function nestVis(){
+            if (document.getElementById("NestSwitch").checked)
+            {
+                map.setLayoutProperty('nesting-layer', 'visibility', 'visible');
+            }
+            else{
+                map.setLayoutProperty('nesting-layer', 'visibility', 'none');
+            }
+        }
+        function beeVis(){
+            if (document.getElementById("BeeSwitch").checked)
+            {
+                map.setLayoutProperty('bee-layer', 'visibility', 'visible');
+            }
+            else{
+                map.setLayoutProperty('bee-layer', 'visibility', 'none');
+            }
+        }
+        function roofVis(){
+            if (document.getElementById("RoofSwitch").checked)
+            {
+                map.setLayoutProperty('roof-layer', 'visibility', 'visible');
+            }
+            else{
+                map.setLayoutProperty('roof-layer', 'visibility', 'none');
+            }
+        }
+        function parkVis(){
+            if (document.getElementById("ParkSwitch").checked)
+            {
+                map.setLayoutProperty('park-layer', 'visibility', 'visible');
+            }
+            else{
+                map.setLayoutProperty('park-layer', 'visibility', 'none');
+            }
+        }
+        function batVis(){
+            if (document.getElementById("BatSwitch").checked)
+            {
+                map.setLayoutProperty('bat-layer', 'visibility', 'visible');
+            }
+            else{
+                map.setLayoutProperty('bat-layer', 'visibility', 'none');
+            }
+        }
+        function agVis(){
+            if (document.getElementById("AgSwitch").checked)
+            {
+                map.setLayoutProperty('ag-layer', 'visibility', 'visible');
+            }
+            else{
+                map.setLayoutProperty('ag-layer', 'visibility', 'none');
+            }
+        }
+        function ecoVis(){
+            if (document.getElementById("EcoSwitch").checked)
+            {
+                map.setLayoutProperty('eco-layer', 'visibility', 'visible');
+            }
+            else{
+                map.setLayoutProperty('eco-layer', 'visibility', 'none');
+            }
+        }
+        function passVis(){
+            if (document.getElementById("PassSwitch").checked)
+            {
+                map.setLayoutProperty('pass-layer', 'visibility', 'visible');
+            }
+            else{
+                map.setLayoutProperty('pass-layer', 'visibility', 'none');
+            }
+        }
+        function pairVis(){
+            if (document.getElementById("PairSwitch").checked)
+            {
+                map.setLayoutProperty('pair-layer', 'visibility', 'visible');
+            }
+            else{
+                map.setLayoutProperty('pair-layer', 'visibility', 'none');
+            }
+        }
+
+    </script>
+</body>
+</html>

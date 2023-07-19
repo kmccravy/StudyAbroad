@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Cities for Kids</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js"></script>
+    <!--Links to Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700&family=Vollkorn:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin:0;
+            border:0;
+            padding:0;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-weight: 300;
+        }
+        #map {
+            position:absolute;
+            left:25%;
+            top:20%;
+            bottom:0;
+            width:75%;
+        }
+        
+        #title {
+            z-index: 99999;
+            text-align: left;
+            position:absolute;
+            top: 0;
+            height: 20%;
+            width: 100%;
+            background-color: #658E9C;
+            color: #F7F7F7
+        } 
+        #titleText{
+            margin-left: 15px
+        }
+        
+        .sidenav{ 
+            position: absolute;
+            background-color: #DBDBDC;
+            top: 20%;
+            left: 0px;
+            width: 25%;
+            height: 80%;
+        }
+        #sidenavText {
+            margin-left: 15px;
+            margin-top: 15px
+        }
+        #info {
+            position:relative;
+            top: 40px;
+        }
+
+        h1 {
+            font-family: 'Vollkorn', serif;
+            font-weight: 800;
+            font-size: 28pt;
+        }
+        h2 {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-weight: 300;
+        }
+        h3 {
+            font-family: 'Vollkorn', serif;
+            font-weight: 600;
+            font-size: 16pt;
+        }
+        p{
+            font-size: 10.5pt;
+        }
+        
+        /* unvisited link */
+        a:link {
+            color: #236126;
+        }
+        /* visited link */
+        a:visited {
+            color: #236126;
+        }
+        
+        /*Changing popup colors*/
+        .mapboxgl-popup-content{
+            background-color: #658E9C;
+            color: #F7F7F7;
+        }
+        .mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+        .mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
+        .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+            border-bottom-color: #658E9C;
+        }
+        .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+        .mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+        .mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
+            border-top-color: #658E9C;
+        }
+        .mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+            border-right-color: #658E9C;
+        }
+        .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+            border-left-color: #658E9C;
+        }
+        
+        /* Code to make checkbox into a retangular toggle from W3schools */
+        /* The switch - the box around the slider */
+        .switch {
+            position: absolute;
+            display: inline-block;
+            left: 50%;
+            width: 30px;
+            height: 17px;
+        }
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #F7F7F7;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 13px;
+            width: 13px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #DBDBDC;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        /* Other slider funtions */
+        input:checked + .slider {
+            background-color: #6E8D9A;
+        }
+        input:focus + .slider {
+            box-shadow: 0 0 1px #6E8D9A;
+        }
+        input:checked + .slider:before {
+            -webkit-transform: translateX(13px);
+            -ms-transform: translateX(13px);
+            transform: translateX(13px);
+        }
+        
+        /* Changing specifc slider color, copied from code above*/
+        /* GreenSlider color */
+        input:checked + #GreenSlider {
+            background-color: #236126;
+        }
+        input:focus + #GreenSlider {
+            box-shadow: 0 0 1px #236126;
+        }
+        /* BikeSlider color */
+        input:checked + #BikeSlider {
+            background-color: #236126; /* UPDATE */
+        }
+        input:focus + #BikeSlider {
+            box-shadow: 0 0 1px #236126;
+        }
+    </style>
+    </head>
+    
+<body>
+    <div id="map"></div>
+    <div id='title'>
+        <div id='titleText'>
+            <h1>Designing cities for Kids</h1>
+            <h2>A Copenhagen Case Study</h2>
+        </div>
+    </div>
+    
+    <div class="sidenav">
+        <div id='sidenavText'>
+            <!--Partner layer switches-->
+            <div> Green Spaces
+                <label class="switch" > 
+                    <input type="checkbox" id="GreenSwitch" onclick="greenVis()">
+                    <span id="GreenSlider" class="slider"></span>
+                </label>
+            </div>
+            <div> Bicycle Network
+                <label class="switch" > 
+                    <input type="checkbox" id="BikeSwitch" onclick="bikeVis()">
+                    <span id="BikeSlider" class="slider"></span>
+                </label>
+            </div>
+            <hr><p>The Municipality of Copenhagen, the capital of Denmark, is striving to create a better city for children with a strong focus on playgrounds. The city maintains 136 playgrounds, 26 of the playgrounds are staffed with a city employee to ensure safety and fun. With a population of 656,787 (95,000 are children ages 14 or under) in an area of 90.1 km<sup>2</sup>, Copenhagen has a playground for about every 4,800 people (about 1 playground for every 700 children). There is about 1.5 playgrounds in every 1 km<sup>2</sup>.
+            </p>
+            <p>When comparing to the capital of the United States of America, Washington DC, both capitols have a similar population. There are 683,154 living in Washington DC, 109,476 of which are children ages 14 or under. However, the DC Department of Park and Recreation maintains 102 playgrounds (about one playground for every 6,700 people or for every 1,000 children). With an area of 158.3 km<sup>2</sup>, Washington DC has 1 playground for every 1.55 km<sup>2</sup>.
+            </p>
+            <hr><p>Copenhagen data sets are from the Copenhagen Municipality hosted by <a href=https://www.opendata.dk/city-of-copenhagen target='_blank'>Open Data DK</a>. The playground data set was translated from Danish to English. Links to data:  <a href=https://www.opendata.dk/city-of-copenhagen/legepladser1 target='_blank'>Playgrounds</a>, <a href=https://www.opendata.dk/city-of-copenhagen/gronne-omrader target='_blank'>Green Spaces</a>, and <a href=https://www.opendata.dk/city-of-copenhagen/cykeldata target='_blank'>Bicycle Network</a>.</p>
+        </div>
+    </div>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoiam9tZXJzb24iLCJhIjoiY2o1bXE2bHlyMnJhZDMzbnpyMnhlODdpcSJ9.QJMJ_cTFCY050aZfSn1umQ';
+
+        //Map bounds
+        var bounds = [
+		    [12.3, 55.5], // Southwest coordinates
+		    [12.85, 55.8] // Northeast coordinates 
+		];
+        //Initialize the map
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v11',
+            center: [12.56, 55.67],
+            zoom: 11,
+            minZoom: 10,
+            maxBounds: bounds,
+        });
+        // Add zoom and rotation controls to the map.
+        map.addControl(new mapboxgl.NavigationControl());
+       
+        //Map on load function
+        map.on('load', () => {           
+            //Green spaces GeoJSOn source
+            map.addSource('GreenSpaces', {
+                type: 'geojson',
+                data: 'https://wfs-kbhkort.kk.dk/k101/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=k101:park_groent_omr_oversigtskort&outputFormat=json&SRSNAME=EPSG:4326&MaxFeatures=300'
+            });
+            //Add green spaces source to map as layer
+            map.addLayer({
+                'id': 'GreenSpaces-layer',
+                'type': 'fill',
+                'source': 'GreenSpaces',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'fill-color': "#236126",
+                }
+            });
+            //Bike Network GeoJSOn source
+            map.addSource('bike', {
+                type: 'geojson',
+                data: 'https://wfs-kbhkort.kk.dk/k101/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=k101:cykeldata_kk&outputFormat=json&SRSNAME=EPSG:4326'
+            });
+            //Add green spaces source to map as layer
+            map.addLayer({
+                'id': 'bike-layer',
+                'type': 'line',
+                'source': 'bike',
+                'layout': {
+                    'visibility': 'none'
+                },
+                'paint': {
+                    'line-color': "purple",
+                }
+            });
+
+            //Playground GeoJSOn source
+            map.addSource('playgrounds', {
+                type: 'geojson',
+                data: 'https://kmccravy.github.io/StudyAbroad/Playgrounds.geojson'
+            });  
+            //Add pantry source to map as layer
+            map.addLayer({
+                'id': 'playground-layer',
+                'type': 'circle',
+                'source': 'playgrounds',
+                'paint': {
+                    'circle-color': 'lightblue',
+                    'circle-radius': 4,
+                    'circle-stroke-color': '#4a4a4a',
+                    'circle-stroke-width': 1,
+                }
+            });
+            // Playground popup code
+            map.on('click', 'playground-layer', (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const description = "<h3>" + e.features[0].properties.Name + "</h3><hr><b>Location:</b> " + e.features[0].properties.District + "<br><b>Type:</b> " + e.features[0].properties.Playground_Type + "<br><b>Recommended Age Group:</b> " + e.features[0].properties.Age_Group + "<hr>" + e.features[0].properties.Description + "<br><br><a href=" + e.features[0].properties.Link + " target='_blank'>Click here</a> to learn more";
+                //Pantry popup appears over points.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                //Adding pantry popup to map
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                });      
+            // Mouseover code for pantry layer
+            map.on('mouseenter', 'playground-layer', function () {
+                map.getCanvas().style.cursor = 'pointer';
+                    });
+                map.on('mouseleave', 'playground-layer', function () {
+                    map.getCanvas().style.cursor = '';
+            });   
+        });
+        
+        //Switches
+        function greenVis(){
+            if (document.getElementById("GreenSwitch").checked)
+            {
+                map.setLayoutProperty('GreenSpaces-layer', 'visibility', 'visible');
+            }
+            else{
+                 map.setLayoutProperty('GreenSpaces-layer', 'visibility', 'none');
+            }
+        }
+        function bikeVis(){
+            if (document.getElementById("BikeSwitch").checked)
+            {
+                map.setLayoutProperty('bike-layer', 'visibility', 'visible');
+            }
+            else{
+                 map.setLayoutProperty('bike-layer', 'visibility', 'none');
+            }
+        }
+    </script>
+</body>
+</html>
